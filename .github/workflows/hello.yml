@@ -7,5 +7,5 @@ jobs:
   hello:
     runs-on: ubuntu-latest
     steps:
-      - name: Testing
-        uses: ./
+      - uses: actions/checkout@v2
+      - uses: ./
