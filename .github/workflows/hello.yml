@@ -1,0 +1,11 @@
+name: "Testin"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Testing
+        uses: ./

@@ -1,0 +1,16 @@
+name: "Gen Postman Documentation"
+description: "Takes an YML input and generates a Postman collection"
+
+inputs:
+  yml:
+    description: "The YML file to generate the Postman collection"
+    required: true
+    default: "postman.yml"
+
+outputs:
+  postman-url:
+    description: "The URL of the folder generated"
+
+runs:
+  using: "node20"
+  main: "dist/index.js"
