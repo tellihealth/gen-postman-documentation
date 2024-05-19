@@ -30,11 +30,24 @@ interface Item {
   description?: string;
   body?: Body;
   headers?: Header[];
+  item?: Item[];
+  request?: Request[];
+  response?: Response[];
+}
+
+interface YMLItems {
+  name: string;
+  type: string;
+  url?: string;
+  method?: string;
+  description?: string;
+  body?: Body;
+  headers?: Header[];
   items?: Item[];
   responses?: Response[];
 }
 
-const transformItem = (item: Item): any => {
+const transformItem = (item: YMLItems): any => {
   if (item.type === "folder") {
     return {
       name: item.name,
@@ -53,7 +66,15 @@ const transformItem = (item: Item): any => {
             }))
           : [],
         body: item.body
-          ? { mode: "raw", raw: JSON.stringify(item.body) }
+          ? {
+              mode: "raw",
+              raw: JSON.stringify(item.body, null, 4),
+              options: {
+                raw: {
+                  language: "json",
+                },
+              },
+            }
           : undefined,
         url: {
           raw: item.url,
@@ -69,7 +90,7 @@ const transformItem = (item: Item): any => {
               (sc) => sc.code === Number(response.status)
             )?.message,
             _postman_previewlanguage: "json",
-            body: JSON.stringify(response.body),
+            body: JSON.stringify(response.body, null, 4),
             header: item.headers
               ? item.headers.map((header) => ({
                   key: header.key,
@@ -86,37 +107,47 @@ const run = async () => {
   try {
     const ymlFile = getInput("yml");
     const fileContents = fs.readFileSync(ymlFile, "utf8");
-    const { collection: collectionName, items } = yaml.load(fileContents) as {
+    const {
+      collection: collectionName,
+      items,
+      folder: folderName,
+      description,
+    } = yaml.load(fileContents) as {
       collection: string;
       items: any[];
+      folder: string;
+      description: string;
     };
 
     const mutatedItems = items.map(transformItem);
-
-    console.log(JSON.stringify(mutatedItems, null, 2));
-
-    // Data Validation Using Zod
-    // Todo
-
     const collections = await getAllCollections();
-    // If Collection Exists
+
     if (collections.length > 0) {
       const collection = collections.find(
         (c: any) => c.name === collectionName
       );
 
       if (collection) {
-        // Get Collection Data
-        //const collectionData = await getCollection(collection.uid);
-        //console.log("Collection Data", collectionData);
+        const collectionData = await getCollection(collection.uid);
+
+        const folderIndex = collectionData.item.findIndex(
+          (item: any) => item.name === folderName
+        );
+
+        if (folderIndex !== -1) {
+          collectionData.item[folderIndex].description = description;
+          collectionData.item[folderIndex].item = mutatedItems;
+
+          console.log(JSON.stringify(collectionData, null, 2));
+        } else {
+          setFailed("Folder was not found.");
+        }
       } else {
         setFailed("Collection was not found.");
       }
     } else {
       setFailed("Collection was not found.");
     }
-
-    // Get Collection Data
 
     const time = new Date().toTimeString();
     setOutput("postman-url", time);
@@ -125,43 +156,4 @@ const run = async () => {
   }
 };
 
-console.log("Hello World!");
 run();
-
-function updateCollectionItems(
-  collectionItems: Item[],
-  desiredItems: Item[]
-): Item[] {
-  const updatedCollection = [...collectionItems];
-
-  desiredItems.forEach((desiredItem) => {
-    const index = updatedCollection.findIndex(
-      (item) => item.name === desiredItem.name
-    );
-
-    if (index !== -1) {
-      // Item exists, update it
-      const existingItem = updatedCollection[index];
-
-      if (
-        desiredItem.type === "folder" &&
-        existingItem.items &&
-        desiredItem.items
-      ) {
-        // If both are folders, update their items recursively
-        existingItem.items = updateCollectionItems(
-          existingItem.items,
-          desiredItem.items
-        );
-      } else {
-        // Update specific fields of the existing item
-        updatedCollection[index] = { ...existingItem, ...desiredItem };
-      }
-    } else {
-      // Item does not exist, add it
-      updatedCollection.push(desiredItem);
-    }
-  });
-
-  return updatedCollection;
-}
