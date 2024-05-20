@@ -148,7 +148,7 @@ const run = async () => {
             items,
         });
         if (!validate.success) {
-            (0, core_1.setFailed)(`Invalid Schema: ${JSON.stringify(validate.error.format(), null, 2)}`);
+            (0, core_1.setFailed)(`Invalid Schema: ${JSON.stringify(validate.error.format())}`);
             return;
         }
         const mutatedItems = items.map(transformItem);
@@ -164,6 +164,7 @@ const run = async () => {
                     await (0, postman_1.updateCollection)(collection.uid, {
                         collection: collectionData,
                     });
+                    console.log("Collection updated successfully.");
                 }
                 else {
                     (0, core_1.setFailed)("Folder was not found.");
@@ -176,8 +177,6 @@ const run = async () => {
         else {
             (0, core_1.setFailed)("Collection was not found.");
         }
-        const time = new Date().toTimeString();
-        (0, core_1.setOutput)("postman-url", time);
     }
     catch (error) {
         (0, core_1.setFailed)(`Action failed with error: ${error}`);
