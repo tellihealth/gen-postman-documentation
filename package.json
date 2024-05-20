@@ -1,7 +1,7 @@
 {
   "name": "gen-postman-documentation",
   "version": "1.0.0",
-  "description": "",
+  "description": "Generates Postman collection from an YML file defination.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -12,16 +12,15 @@
   "license": "ISC",
   "dependencies": {
     "@actions/core": "^1.10.1",
-    "@actions/github": "^6.0.0",
-    "@vercel/ncc": "^0.38.1",
     "axios": "^1.6.8",
     "js-yaml": "^4.1.0",
-    "uuid": "^9.0.1"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.12.12",
     "@types/uuid": "^9.0.8",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "@vercel/ncc": "^0.38.1"
   }
 }

@@ -6,10 +6,9 @@ inputs:
     description: "The YML file to generate the Postman collection"
     required: true
     default: "postman.yml"
-
-outputs:
-  postman-url:
-    description: "The URL of the folder generated"
+  api-key:
+    description: "The Postman API key"
+    required: true
 
 runs:
   using: "node20"

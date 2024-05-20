@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "API Collection Schema - Gen-Postman-Documentation",
+  "type": "object",
+  "properties": {
+    "collection": {
+      "type": "string"
+    },
+    "folder": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["request"]
+              },
+              "url": {
+                "type": "string"
+              },
+              "method": {
+                "type": "string",
+                "enum": ["GET", "POST", "PUT", "DELETE", "PATCH"]
+              },
+              "description": {
+                "type": "string"
+              },
+              "body": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "headers": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["key", "value"]
+                }
+              },
+              "responses": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "enum": [
+                        200, 201, 204, 304, 400, 401, 403, 404, 405, 409, 410,
+                        415, 422, 429, 500, 503
+                      ]
+                    },
+                    "body": {
+                      "type": "object",
+                      "additionalProperties": true
+                    }
+                  },
+                  "required": ["name", "status", "body"]
+                }
+              }
+            },
+            "required": ["name", "type", "url", "method", "description"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["folder"]
+              },
+              "description": {
+                "type": "string"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/properties/items/items"
+                }
+              }
+            },
+            "required": ["name", "type", "description", "items"]
+          }
+        ]
+      }
+    }
+  },
+  "required": ["collection", "folder", "description", "items"]
+}

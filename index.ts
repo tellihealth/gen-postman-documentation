@@ -1,8 +1,14 @@
-import { getInput, setOutput, setFailed } from "@actions/core";
-import yaml from "js-yaml";
 import fs from "fs";
-import { getAllCollections, getCollection } from "./functions/postman";
+import yaml from "js-yaml";
+import {
+  getAllCollections,
+  getCollection,
+  setAPIKey,
+  updateCollection,
+} from "./functions/postman";
+import { getInput, setFailed } from "@actions/core";
 import statusCodes from "./utils/statusCodes";
+import inputSchema from "./utils/dataValidation";
 
 interface Header {
   key: string;
@@ -17,11 +23,6 @@ interface Response {
   headers: Header[];
 }
 
-interface Body {
-  page: number;
-  limit: number;
-}
-
 interface Item {
   name: string;
   type: string;
@@ -32,7 +33,6 @@ interface Item {
   headers?: Header[];
   item?: Item[];
   request?: Request[];
-  response?: Response[];
 }
 
 interface YMLItems {
@@ -41,7 +41,7 @@ interface YMLItems {
   url?: string;
   method?: string;
   description?: string;
-  body?: Body;
+  body?: any;
   headers?: Header[];
   items?: Item[];
   responses?: Response[];
@@ -105,19 +105,41 @@ const transformItem = (item: YMLItems): any => {
 
 const run = async () => {
   try {
+    setAPIKey(getInput("api-key"));
+
     const ymlFile = getInput("yml");
+
+    if (!fs.existsSync(ymlFile)) {
+      setFailed("YML file not found.");
+      return;
+    }
+
     const fileContents = fs.readFileSync(ymlFile, "utf8");
+    const input = yaml.load(fileContents);
+
     const {
       collection: collectionName,
       items,
       folder: folderName,
       description,
-    } = yaml.load(fileContents) as {
+    } = input as {
       collection: string;
       items: any[];
       folder: string;
       description: string;
     };
+
+    const validate = inputSchema.safeParse({
+      collection: collectionName,
+      folder: folderName,
+      description,
+      items,
+    });
+
+    if (!validate.success) {
+      setFailed(`Invalid Schema: ${JSON.stringify(validate.error.format())}`);
+      return;
+    }
 
     const mutatedItems = items.map(transformItem);
     const collections = await getAllCollections();
@@ -138,7 +160,11 @@ const run = async () => {
           collectionData.item[folderIndex].description = description;
           collectionData.item[folderIndex].item = mutatedItems;
 
-          console.log(JSON.stringify(collectionData, null, 2));
+          await updateCollection(collection.uid, {
+            collection: collectionData,
+          });
+
+          console.log("Collection updated successfully.");
         } else {
           setFailed("Folder was not found.");
         }
@@ -148,9 +174,6 @@ const run = async () => {
     } else {
       setFailed("Collection was not found.");
     }
-
-    const time = new Date().toTimeString();
-    setOutput("postman-url", time);
   } catch (error) {
     setFailed(`Action failed with error: ${error}`);
   }
