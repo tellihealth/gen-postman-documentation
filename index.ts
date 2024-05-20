@@ -105,6 +105,8 @@ const transformItem = (item: YMLItems): any => {
 
 const run = async () => {
   try {
+    const collectionName = getInput("collection");
+
     setAPIKey(getInput("api-key"));
 
     const ymlFile = getInput("yml");
@@ -118,12 +120,10 @@ const run = async () => {
     const input = yaml.load(fileContents);
 
     const {
-      collection: collectionName,
       items,
       folder: folderName,
       description,
     } = input as {
-      collection: string;
       items: any[];
       folder: string;
       description: string;
