@@ -3,9 +3,6 @@
   "title": "API Collection Schema - Gen-Postman-Documentation",
   "type": "object",
   "properties": {
-    "collection": {
-      "type": "string"
-    },
     "folder": {
       "type": "string"
     },
@@ -37,8 +34,19 @@
                 "type": "string"
               },
               "body": {
-                "type": "object",
-                "additionalProperties": true
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": true
+                    }
+                  }
+                ]
               },
               "headers": {
                 "type": "array",
@@ -71,8 +79,19 @@
                       ]
                     },
                     "body": {
-                      "type": "object",
-                      "additionalProperties": true
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "additionalProperties": true
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": true
+                          }
+                        }
+                      ]
                     }
                   },
                   "required": ["name", "status", "body"]

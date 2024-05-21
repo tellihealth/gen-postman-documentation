@@ -132,15 +132,16 @@ const transformItem = (item) => {
 };
 const run = async () => {
     try {
-        (0, postman_1.setAPIKey)((0, core_1.getInput)("api-key"));
+        const collectionName = (0, core_1.getInput)("collection");
         const ymlFile = (0, core_1.getInput)("yml");
+        (0, postman_1.setAPIKey)((0, core_1.getInput)("api-key"));
         if (!fs_1.default.existsSync(ymlFile)) {
             (0, core_1.setFailed)("YML file not found.");
             return;
         }
         const fileContents = fs_1.default.readFileSync(ymlFile, "utf8");
         const input = js_yaml_1.default.load(fileContents);
-        const { collection: collectionName, items, folder: folderName, description, } = input;
+        const { items, folder: folderName, description, } = input;
         const validate = dataValidation_1.default.safeParse({
             collection: collectionName,
             folder: folderName,
@@ -164,18 +165,18 @@ const run = async () => {
                     await (0, postman_1.updateCollection)(collection.uid, {
                         collection: collectionData,
                     });
-                    console.log("Collection updated successfully.");
+                    console.log(`Folder ${folderName} updated successfully.`);
                 }
                 else {
-                    (0, core_1.setFailed)("Folder was not found.");
+                    (0, core_1.setFailed)(`Folder ${folderName} was not found in the collection.`);
                 }
             }
             else {
-                (0, core_1.setFailed)("Collection was not found.");
+                (0, core_1.setFailed)(`Collection ${collectionName} was not found.`);
             }
         }
         else {
-            (0, core_1.setFailed)("Collection was not found.");
+            (0, core_1.setFailed)("No collections found.");
         }
     }
     catch (error) {
@@ -209,13 +210,16 @@ const headerSchema = zod_1.z.object({
     key: zod_1.z.string(),
     value: zod_1.z.string(),
 });
-const bodySchema = zod_1.z.record(zod_1.z.any());
+const bodySchema = zod_1.z.union([
+    zod_1.z.record(zod_1.z.any({ required_error: "Response body is required!" })),
+    zod_1.z.array(zod_1.z.record(zod_1.z.any())),
+]);
 const responseSchema = zod_1.z.object({
     name: zod_1.z.string({ required_error: "Response name is required!" }),
     status: zod_1.z
         .number({ required_error: "Response status is required!" })
         .refine(responseStatusValidator),
-    body: zod_1.z.record(zod_1.z.any({ required_error: "Response body is required!" })),
+    body: bodySchema.optional(),
 });
 const requestItemSchema = zod_1.z.object({
     name: zod_1.z.string({ required_error: "Request name is required!" }),

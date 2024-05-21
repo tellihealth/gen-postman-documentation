@@ -19,14 +19,17 @@ const headerSchema = z.object({
   value: z.string(),
 });
 
-const bodySchema = z.record(z.any());
+const bodySchema = z.union([
+  z.record(z.any({ required_error: "Response body is required!" })),
+  z.array(z.record(z.any())),
+]);
 
 const responseSchema = z.object({
   name: z.string({ required_error: "Response name is required!" }),
   status: z
     .number({ required_error: "Response status is required!" })
     .refine(responseStatusValidator),
-  body: z.record(z.any({ required_error: "Response body is required!" })),
+  body: bodySchema.optional(),
 });
 
 const requestItemSchema = z.object({

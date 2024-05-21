@@ -106,10 +106,8 @@ const transformItem = (item: YMLItems): any => {
 const run = async () => {
   try {
     const collectionName = getInput("collection");
-
-    setAPIKey(getInput("api-key"));
-
     const ymlFile = getInput("yml");
+    setAPIKey(getInput("api-key"));
 
     if (!fs.existsSync(ymlFile)) {
       setFailed("YML file not found.");
@@ -164,15 +162,15 @@ const run = async () => {
             collection: collectionData,
           });
 
-          console.log("Collection updated successfully.");
+          console.log(`Folder ${folderName} updated successfully.`);
         } else {
-          setFailed("Folder was not found.");
+          setFailed(`Folder ${folderName} was not found in the collection.`);
         }
       } else {
-        setFailed("Collection was not found.");
+        setFailed(`Collection ${collectionName} was not found.`);
       }
     } else {
-      setFailed("Collection was not found.");
+      setFailed("No collections found.");
     }
   } catch (error) {
     setFailed(`Action failed with error: ${error}`);
