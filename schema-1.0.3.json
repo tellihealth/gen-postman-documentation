@@ -37,13 +37,13 @@
                 "oneOf": [
                   {
                     "type": "object",
-                    "additionalProperties": true
+                    "additionalProperties": false
                   },
                   {
                     "type": "array",
                     "items": {
                       "type": "object",
-                      "additionalProperties": true
+                      "additionalProperties": false
                     }
                   }
                 ]
@@ -82,13 +82,13 @@
                       "oneOf": [
                         {
                           "type": "object",
-                          "additionalProperties": true
+                          "additionalProperties": false
                         },
                         {
                           "type": "array",
                           "items": {
                             "type": "object",
-                            "additionalProperties": true
+                            "additionalProperties": false
                           }
                         }
                       ]
@@ -126,5 +126,6 @@
       }
     }
   },
-  "required": ["folder", "description", "items"]
+  "required": ["folder", "description", "items"],
+  "additionalProperties": false
 }
