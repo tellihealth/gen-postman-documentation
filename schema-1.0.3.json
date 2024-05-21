@@ -126,5 +126,5 @@
       }
     }
   },
-  "required": ["collection", "folder", "description", "items"]
+  "required": ["folder", "description", "items"]
 }
