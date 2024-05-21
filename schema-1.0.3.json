@@ -37,13 +37,13 @@
                 "oneOf": [
                   {
                     "type": "object",
-                    "additionalProperties": false
+                    "additionalProperties": true
                   },
                   {
                     "type": "array",
                     "items": {
                       "type": "object",
-                      "additionalProperties": false
+                      "additionalProperties": true
                     }
                   }
                 ]
@@ -82,13 +82,13 @@
                       "oneOf": [
                         {
                           "type": "object",
-                          "additionalProperties": false
+                          "additionalProperties": true
                         },
                         {
                           "type": "array",
                           "items": {
                             "type": "object",
-                            "additionalProperties": false
+                            "additionalProperties": true
                           }
                         }
                       ]
