@@ -1,6 +1,6 @@
 {
   "name": "gen-postman-documentation",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Generates Postman collection from an YML file defination.",
   "main": "index.js",
   "scripts": {
